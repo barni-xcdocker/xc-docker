@@ -1,0 +1,64 @@
+version: '3'
+ 
+services:
+    apache2:
+        container_name: ${PROJECT_NAME}_apache
+        build:
+            context: ./apache
+            args:
+                - WEB_USER=${WEB_USER}
+                - WEB_GROUP=${WEB_GROUP}
+                - APACHE_ROOT_DIR=${APACHE_ROOT_DIR}
+                - APP_DOMAIN=${PROJECT_NAME}${TLD_DOMAIN}
+                - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER} 
+        volumes:
+            - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
+        networks:
+            - frontend
+            - backend
+        expose:
+          - "80"
+          - "443"
+        environment:
+            - VIRTUAL_HOST=${PROJECT_NAME}${TLD_DOMAIN}
+            - CERT_NAME=shared
+            - HTTPS_METHOD=noredirect
+            - WEB_USER=${WEB_USER}
+            - WEB_GROUP=${WEB_GROUP}
+    php-fpm:
+      container_name: ${PROJECT_NAME}_php-fpm
+      build:
+        context: ./php-fpm
+        args:
+          - SOFTWARE_ENGINE=${SOFTWARE_ENGINE}
+          - APP_PHP_VERSION=${APP_PHP_VERSION}
+      volumes:
+        - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
+      networks:
+        backend:
+          aliases:
+            - php
+      depends_on:
+        - apache2
+    mysql:
+        container_name: ${PROJECT_NAME}_mysql
+        build:
+            context: ./mysql
+            args:
+                - MYSQL_CONTAINER_USER=${MYSQL_CONTAINER_USER}
+                - MYSQL_CONTAINER_GROUP=${MYSQL_CONTAINER_GROUP}
+        volumes:
+            - ./var/log/mysql:${MYSQL_LOG_DIR}
+            - ./var/data/mysql/database:${MYSQL_DATA_DIR}
+        networks:
+          - backend
+        environment:
+            - MYSQL_CONTAINER_USER=${MYSQL_CONTAINER_USER}
+            - MYSQL_CONTAINER_GROUP=${MYSQL_CONTAINER_GROUP}
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+networks:
+    frontend:
+        external:
+            name: nginx-proxy
+    backend:
+        driver: bridge
