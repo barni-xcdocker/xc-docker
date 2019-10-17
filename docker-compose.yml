@@ -25,6 +25,9 @@ services:
             - HTTPS_METHOD=noredirect
             - WEB_USER=${WEB_USER}
             - WEB_GROUP=${WEB_GROUP}
+        depends_on:
+            - php-fpm
+            - mysql
     php-fpm:
       container_name: ${PROJECT_NAME}_php-fpm
       build:
@@ -38,8 +41,6 @@ services:
         backend:
           aliases:
             - php
-      depends_on:
-        - apache2
     mysql:
         container_name: ${PROJECT_NAME}_mysql
         build:
@@ -48,7 +49,6 @@ services:
                 - MYSQL_CONTAINER_USER=${MYSQL_CONTAINER_USER}
                 - MYSQL_CONTAINER_GROUP=${MYSQL_CONTAINER_GROUP}
         volumes:
-            - ./var/log/mysql:${MYSQL_LOG_DIR}
             - ./var/data/mysql/database:${MYSQL_DATA_DIR}
         networks:
           - backend
@@ -56,6 +56,21 @@ services:
             - MYSQL_CONTAINER_USER=${MYSQL_CONTAINER_USER}
             - MYSQL_CONTAINER_GROUP=${MYSQL_CONTAINER_GROUP}
             - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    workspace:
+        container_name: ${PROJECT_NAME}_workspace
+        build:
+            context: ./workspace
+            args:
+              - SOFTWARE_ENGINE=${SOFTWARE_ENGINE}
+              - APP_PHP_VERSION=${APP_PHP_VERSION}
+              - MYSQL_HOST=${PROJECT_NAME}_mysql
+              - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+              - MYSQL_ROOT_USER=${MYSQL_ROOT_USER}
+              - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER} 
+        networks:
+          - backend
+        volumes:
+            - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
 networks:
     frontend:
         external:
