@@ -2,14 +2,14 @@ version: '3'
  
 services:
     apache2:
-        container_name: ${PROJECT_NAME}_apache
+        container_name: ${COMPOSE_PROJECT_NAME}_apache
         build:
             context: ./apache
             args:
                 - WEB_USER=${WEB_USER}
                 - WEB_GROUP=${WEB_GROUP}
                 - APACHE_ROOT_DIR=${APACHE_ROOT_DIR}
-                - APP_DOMAIN=${PROJECT_NAME}${TLD_DOMAIN}
+                - APP_DOMAIN=${COMPOSE_PROJECT_NAME}${TLD_DOMAIN}
                 - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER} 
         volumes:
             - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
@@ -20,7 +20,7 @@ services:
           - "80"
           - "443"
         environment:
-            - VIRTUAL_HOST=${PROJECT_NAME}${TLD_DOMAIN}
+            - VIRTUAL_HOST=${COMPOSE_PROJECT_NAME}${TLD_DOMAIN}
             - CERT_NAME=shared
             - HTTPS_METHOD=noredirect
             - WEB_USER=${WEB_USER}
@@ -29,7 +29,7 @@ services:
             - php-fpm
             - mysql
     php-fpm:
-      container_name: ${PROJECT_NAME}_php-fpm
+      container_name: ${COMPOSE_PROJECT_NAME}_php-fpm
       build:
         context: ./php-fpm
         args:
@@ -42,7 +42,7 @@ services:
           aliases:
             - php
     mysql:
-        container_name: ${PROJECT_NAME}_mysql
+        container_name: ${COMPOSE_PROJECT_NAME}_mysql
         build:
             context: ./mysql
             args:
@@ -51,26 +51,31 @@ services:
         volumes:
             - ./var/data/mysql/database:${MYSQL_DATA_DIR}
         networks:
-          - backend
+          backend:
+            aliases:
+              - mysqlhost
         environment:
             - MYSQL_CONTAINER_USER=${MYSQL_CONTAINER_USER}
             - MYSQL_CONTAINER_GROUP=${MYSQL_CONTAINER_GROUP}
             - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+            - MYSQL_ROOT_HOST=%
     workspace:
-        container_name: ${PROJECT_NAME}_workspace
+        container_name: ${COMPOSE_PROJECT_NAME}_workspace
         build:
             context: ./workspace
             args:
               - SOFTWARE_ENGINE=${SOFTWARE_ENGINE}
               - APP_PHP_VERSION=${APP_PHP_VERSION}
-              - MYSQL_HOST=${PROJECT_NAME}_mysql
-              - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-              - MYSQL_ROOT_USER=${MYSQL_ROOT_USER}
-              - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER} 
+              - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
+              - APP_DOMAIN=${COMPOSE_PROJECT_NAME}${TLD_DOMAIN}
         networks:
           - backend
         volumes:
             - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
+            - x-service-shared:/etc/shared/x-service-shared
+volumes:
+  x-service-shared:
+    external: true
 networks:
     frontend:
         external:

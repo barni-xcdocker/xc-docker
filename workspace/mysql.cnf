@@ -1,4 +1,0 @@
-[client]
-host     = {{MYSQL_HOST}}
-user     = {{MYSQL_ROOT_USER}}
-password = {{MYSQL_ROOT_PASSWORD}}
