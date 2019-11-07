@@ -49,7 +49,7 @@ services:
                 - MYSQL_CONTAINER_USER=${MYSQL_CONTAINER_USER}
                 - MYSQL_CONTAINER_GROUP=${MYSQL_CONTAINER_GROUP}
         volumes:
-            - ./var/data/mysql/database:${MYSQL_DATA_DIR}
+            - ./var/data/mysql/database:/var/lib/mysql
         networks:
           backend:
             aliases:
