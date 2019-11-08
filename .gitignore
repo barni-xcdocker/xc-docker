@@ -1,2 +1,3 @@
+!/**
 /var/data/mysql/database/*
 !/var/data/mysql/database/.gitignore
