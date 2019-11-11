@@ -1,0 +1,8 @@
+services:
+    workspace:
+        build:
+            context: ./workspace
+            args:
+              - XDEV_DEV_MODE=true
+        volumes:
+            - ../../xdev:/home/xcdocker/xdev
