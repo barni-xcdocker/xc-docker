@@ -1,11 +1,11 @@
-ARG APP_PHP_VERSION
+ARG TAG_PHP_FPM
 
-FROM barnixcart/php-fpm:xc5-${APP_PHP_VERSION}
+FROM barnixcart/php-fpm:${TAG_PHP_FPM}
 
-ARG APP_PHP_VERSION
-ARG SOFTWARE_ENGINE
 COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
-COPY ./${SOFTWARE_ENGINE}/php${APP_PHP_VERSION}.ini /usr/local/etc/php/php.ini
+
+ARG TAG_PHP_FPM
+COPY ./${TAG_PHP_FPM}/php.ini /usr/local/etc/php/php.ini
 
 RUN usermod -u 1000 www-data
 
