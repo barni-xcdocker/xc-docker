@@ -14,8 +14,8 @@ ARG APP_DOMAIN
 
 RUN sed -i "s~{{http_host}}~$APP_DOMAIN~g" /home/xcdocker/.xdev/config.yaml
 
-ARG TAG_WORKSPACE
-COPY ./${TAG_WORKSPACE}/php.ini /etc/php/7.2/cli/php.ini
+# Uncomment if you need to customize php.ini
+#COPY ./php/php.ini /etc/php/7.x/cli/php.ini
 
 ARG APP_CODE_PATH_CONTAINER
 WORKDIR ${APP_CODE_PATH_CONTAINER}
