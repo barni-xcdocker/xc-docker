@@ -37,6 +37,7 @@ services:
       volumes:
         - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
       networks:
+        frontend:
         backend:
           aliases:
             - php
@@ -71,6 +72,17 @@ services:
         volumes:
             - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
             - x-service-shared:/etc/shared/x-service-shared
+    phpmyadmin:
+        container_name: ${COMPOSE_PROJECT_NAME}_phpmyadmin
+        build: ./phpmyadmin
+        environment:
+            - VIRTUAL_HOST=pma.${COMPOSE_PROJECT_NAME}${TLD_DOMAIN}
+            - PMA_HOST=mysqlhost
+            - PMA_USER=root
+            - PMA_PASSWORD=pass
+        networks:
+            - frontend
+            - backend
 volumes:
   x-service-shared:
     external: true
