@@ -14,8 +14,10 @@ services:
         volumes:
             - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
         networks:
-            - frontend
-            - backend
+            frontend:
+            backend:
+              aliases:
+                - ${COMPOSE_PROJECT_NAME}${TLD_DOMAIN}
         expose:
           - "80"
           - "443"
