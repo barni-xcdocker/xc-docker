@@ -70,6 +70,7 @@ services:
               - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER}
               - APP_DOMAIN=${COMPOSE_PROJECT_NAME}${TLD_DOMAIN}
         networks:
+          - frontend
           - backend
         volumes:
             - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
