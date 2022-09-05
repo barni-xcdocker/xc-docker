@@ -10,7 +10,7 @@ services:
                 - WEB_GROUP=${WEB_GROUP}
                 - APACHE_ROOT_DIR=${APACHE_ROOT_DIR}
                 - APP_DOMAIN=${COMPOSE_PROJECT_NAME}${TLD_DOMAIN}
-                - APP_CODE_PATH_CONTAINER=${APP_CODE_PATH_CONTAINER} 
+                - APP_WEB_ROOT_DIR=${APP_WEB_ROOT_DIR} 
         volumes:
             - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
         networks:
